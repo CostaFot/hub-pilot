@@ -80,3 +80,9 @@ update();
 // GitHub fires these events on client-side navigation
 document.addEventListener("turbo:load", update);
 document.addEventListener("soft-nav:end", update);
+
+// Fallback: watch the page title — it always changes on navigation
+const titleEl = document.querySelector("title");
+if (titleEl) {
+  new MutationObserver(update).observe(titleEl, { childList: true });
+}
