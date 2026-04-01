@@ -24,7 +24,8 @@ jobs:
           zip -r hub-pilot-${{ steps.version.outputs.tag }}.zip . \
             --exclude ".git/*" \
             --exclude ".github/*" \
-            --exclude "*.md"
+            --exclude "*.md" \
+            --exclude ".gitignore"
 
       - name: Create release
         uses: softprops/action-gh-release@v2
