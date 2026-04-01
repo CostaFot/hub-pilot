@@ -14,11 +14,14 @@ function postHelloViaUI() {
   nativeInputValueSetter.call(textarea, "hello");
   textarea.dispatchEvent(new Event("input", { bubbles: true }));
 
-  // The submit button sits inside the same form as the textarea
+  // The form has multiple submit buttons ("Comment" and "Close pull request")
+  // so match by text content rather than just type=submit
   const form = textarea.closest("form");
-  const submitBtn = form?.querySelector('button[type="submit"]');
+  const submitBtn = Array.from(form?.querySelectorAll('button[type="submit"]') ?? []).find(
+    (btn) => btn.textContent.trim().toLowerCase() === "comment"
+  );
   if (!submitBtn) {
-    alert("Hub Pilot: Could not find the submit button.");
+    alert("Hub Pilot: Could not find the Comment submit button.");
     return;
   }
 
