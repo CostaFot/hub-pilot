@@ -82,7 +82,7 @@ function startObserving() {
     }
   });
 
-  domObserver.observe(document.body, { childList: true, subtree: true });
+  domObserver.observe(document.documentElement, { childList: true, subtree: true });
 }
 
 // Initial load (hard refresh / direct URL)
