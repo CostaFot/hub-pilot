@@ -1,0 +1,16 @@
+{
+  "manifest_version": 3,
+  "name": "Hub Pilot",
+  "version": "1.0.0",
+  "description": "GitHub UI automations",
+  "host_permissions": [
+    "https://github.com/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": ["https://github.com/*/pull/*"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}
