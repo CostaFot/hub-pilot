@@ -59,14 +59,24 @@ function injectButton() {
   document.body.appendChild(btn);
 }
 
-// GitHub uses client-side navigation, so re-inject on URL changes
-let lastURL = location.href;
-injectButton();
+function isPRPage() {
+  return /^\/[^/]+\/[^/]+\/pull\/\d+/.test(location.pathname);
+}
 
-const observer = new MutationObserver(() => {
-  if (location.href !== lastURL) {
-    lastURL = location.href;
+function removeButton() {
+  document.getElementById("hub-pilot-hello-btn")?.remove();
+}
+
+function update() {
+  if (isPRPage()) {
     injectButton();
+  } else {
+    removeButton();
   }
-});
-observer.observe(document.body, { childList: true, subtree: true });
+}
+
+update();
+
+// GitHub fires these events on client-side navigation
+document.addEventListener("turbo:load", update);
+document.addEventListener("soft-nav:end", update);
