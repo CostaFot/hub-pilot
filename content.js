@@ -59,30 +59,35 @@ function injectButton() {
   document.body.appendChild(btn);
 }
 
-function isPRPage() {
-  return /^\/[^/]+\/[^/]+\/pull\/\d+/.test(location.pathname);
-}
-
 function removeButton() {
   document.getElementById("hub-pilot-hello-btn")?.remove();
 }
 
-function update() {
-  if (isPRPage()) {
-    injectButton();
-  } else {
-    removeButton();
-  }
+// Watch for #new_comment_field to appear (PR page loaded) or disappear (navigated away)
+let domObserver = null;
+
+function startObserving() {
+  if (domObserver) domObserver.disconnect();
+
+  domObserver = new MutationObserver(() => {
+    const onPRPage = /^\/[^/]+\/[^/]+\/pull\/\d+/.test(location.pathname);
+    if (!onPRPage) {
+      removeButton();
+      return;
+    }
+    if (document.getElementById("new_comment_field")) {
+      injectButton();
+    } else {
+      removeButton();
+    }
+  });
+
+  domObserver.observe(document.body, { childList: true, subtree: true });
 }
 
-update();
-
-// GitHub fires these events on client-side navigation
-document.addEventListener("turbo:load", update);
-document.addEventListener("soft-nav:end", update);
-
-// Fallback: watch the page title — it always changes on navigation
-const titleEl = document.querySelector("title");
-if (titleEl) {
-  new MutationObserver(update).observe(titleEl, { childList: true });
+// Initial load (hard refresh / direct URL)
+if (document.getElementById("new_comment_field")) {
+  injectButton();
 }
+
+startObserving();
