@@ -1,10 +1,12 @@
 function postHelloViaUI() {
-  // GitHub's main PR comment textarea
   const textarea = document.querySelector("#new_comment_field");
   if (!textarea) {
     alert("Hub Pilot: Could not find the comment box. Make sure you're on a PR page.");
     return;
   }
+
+  // Focus first so GitHub activates the form
+  textarea.focus();
 
   // React tracks input via the native value setter — plain assignment won't trigger it
   const nativeInputValueSetter = Object.getOwnPropertyDescriptor(
@@ -13,19 +15,22 @@ function postHelloViaUI() {
   ).set;
   nativeInputValueSetter.call(textarea, "hello");
   textarea.dispatchEvent(new Event("input", { bubbles: true }));
+  textarea.dispatchEvent(new Event("change", { bubbles: true }));
 
-  // The form has multiple submit buttons ("Comment" and "Close pull request")
-  // so match by text content rather than just type=submit
-  const form = textarea.closest("form");
-  const submitBtn = Array.from(form?.querySelectorAll('button[type="submit"]') ?? []).find(
-    (btn) => btn.textContent.trim().toLowerCase() === "comment"
-  );
-  if (!submitBtn) {
-    alert("Hub Pilot: Could not find the Comment submit button.");
-    return;
-  }
-
-  submitBtn.click();
+  // Wait a tick for React to re-render and enable the submit button
+  setTimeout(() => {
+    const form = textarea.closest("form");
+    const submitBtn = Array.from(form?.querySelectorAll('button[type="submit"]') ?? []).find(
+      (btn) => btn.textContent.trim().toLowerCase() === "comment"
+    );
+    if (!submitBtn) {
+      alert("Hub Pilot: Could not find the Comment submit button.");
+      return;
+    }
+    // Force-enable in case React hasn't caught up yet
+    submitBtn.disabled = false;
+    submitBtn.click();
+  }, 100);
 }
 
 function injectButton() {
